@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask the Math Genius! 🤓</title>
+    <style>
+        body {
+            font-family: "Comic Sans MS", sans-serif;
+            background-color: #e9f5db;
+            color: #1b4332;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #40916c;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin: 20px 0;
+            border: 2px solid #52b788;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #40916c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #52b788;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #344e41;
+        }
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .navbar a {
+            text-decoration: none;
+            margin: 0 10px;
+            color: #1b4332;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            color: #40916c;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/search">Search Bar</a>
+    </div>
+    <h1>Welcome to Ask the Math Genius! 🤓</h1>
+    <p>Assement Template: Find a Lesson Plan! 🧠</p>
+
+    <input type="text" id="question" placeholder="Find a Lesson Plan..." aria-label="Math question input">
+    <button onclick="askLLM()">Ask Genius</button>
+
+    <div id="output"></div>
+
+    <script>
+        async function askLLM() {
+    const question = document.getElementById('question').value;
+    const output = document.getElementById('output');
+
+    if (!question.trim()) {
+        output.textContent = "Please type a question! 🤔";
+        return;
+    }
+
+    output.textContent = "Thinking... 🤔";
+
+    try {
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question })
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+
+        if (data.pdf_url) {
+            // Display the PDF inline using an <embed> tag
+            output.innerHTML = `<embed src="${data.pdf_url}" width="100%" height="600px" type="application/pdf" />`;
+
+            // Optional: Add a download link
+            output.innerHTML += `<p><a href="${data.pdf_url}" download>Download PDF</a></p>`;
+        } else {
+            output.textContent = "Oops! No PDF found. Try again!";
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        output.textContent = "Something went wrong. Please try again later. 😢";
+    }
+}
+    </script>
+</body>
+</html>
