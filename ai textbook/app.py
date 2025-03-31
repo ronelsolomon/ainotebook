@@ -7,8 +7,7 @@ import re
 
 # API key
 client = Groq(
-    api_key="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",
-)
+    api_key=
 
 app = Flask(__name__, static_folder="static")
 
