@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to the Math Genius Learning Portal!</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Genius Learning Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        /* Global Styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f7fc;
@@ -16,12 +15,12 @@
             color: #333;
         }
 
-        h1, p {
+        h1,
+        p {
             text-align: center;
             margin-bottom: 20px;
         }
 
-        /* Navbar */
         .navbar {
             background-color: #007bff;
             overflow: hidden;
@@ -41,7 +40,6 @@
             background-color: #0056b3;
         }
 
-        /* Main Content */
         .input-container {
             display: flex;
             justify-content: center;
@@ -49,35 +47,33 @@
         }
 
         #question {
-            padding: 10px;
+            padding: 15px;
             font-size: 16px;
-            width: 300px;
+            width: 900px;
+            height: 150px;
             border: 2px solid #007bff;
             border-radius: 5px;
             outline: none;
             margin-right: 10px;
-        }
-
-        #question:focus {
-            border-color: #0056b3;
+            resize: vertical;
         }
 
         button {
             background-color: #007bff;
             color: white;
             font-size: 16px;
-            padding: 10px 20px;
+            padding: 15px 20px;
             border: none;
+            height: 50px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease-in-out;
         }
 
         button:hover {
             background-color: #0056b3;
         }
 
-        /* Output Area */
         #output {
             text-align: center;
             margin-top: 30px;
@@ -87,85 +83,516 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* PDF Embed */
-        embed {
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px;
         }
 
-        /* Footer */
-        p a {
-            color: #007bff;
-            text-decoration: none;
+        .chapter-card {
+            background-color: #e6f0ff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .chapter-card:hover {
+            background-color: #cce0ff;
+            transform: scale(1.05);
+        }
+
+        .chapter-card.selected {
+            background-color: #99ccff !important;
+        }
+
+        .chapter-card.select-all-card {
+            background-color: #e6f0ff;
             font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
         }
 
-        p a:hover {
-            text-decoration: underline;
+        .chapter-card.select-all-card:hover {
+            background-color: #cce0ff;
+        }
+
+        .chapter-card.select-all-card.selected {
+            background-color: #3399ff !important;
+            color: white;
+        }
+
+        .lesson-list {
+            display: none;
+            margin-top: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+        }
+
+        .chapter-card:hover .lesson-list {
+            display: block;
+        }
+
+        .lesson-item {
+            padding: 6px 12px;
+            font-size: 15px;
+            margin-left: 10px;
+            border-left: 3px solid #007bff;
+        }
+
+        .lesson-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .add-lesson-button,
+        .add-chapter-button {
+            display: block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .add-lesson-button:hover,
+        .add-chapter-button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
+
 <body>
-    <!-- Navbar with links to Home and Search -->
     <div class="navbar">
         <a href="/">Home</a>
-        <a href="/search">Search for Lesson Plans</a>
+        <a href="/search">Search for Math AI Textbook</a>
     </div>
 
-    <!-- Main title and description -->
     <h1>Welcome to Ask the Math Genius! 🤓</h1>
-    <p>Use this tool to generate PDF lesson plans and explore math concepts in-depth. 🧠</p>
+    <p>Use this tool to generate lesson plans and explore math concepts in-depth. 🧠</p>
 
-    <!-- Search input and button to ask the Genius -->
     <div class="input-container">
-        <input type="text" id="question" placeholder="Enter a math topic for a lesson plan..." aria-label="Math question input">
+        <textarea id="question" placeholder="Enter a math topic for a Table of Content..."
+            aria-label="Math question input"></textarea>
         <button onclick="askLLM()">Ask Genius</button>
     </div>
 
-    <!-- Output area to display results -->
+    <div id="explanation"></div>
+
     <div id="output"></div>
+    <div id="chapterContainer" class="grid-container"></div>
+    <div id="contentArea" style="display: none;">
+    <div id="chapterContainer" class="grid-container"></div>
+
+    
+
+    
+
+
+    <h3 style="text-align:center;">📋 Currently Selected Lessons</h3>
+    <div id="selectedSummary" style="...">
+        <p>No lessons selected yet.</p>
+    </div>
+
+    <h3 style="text-align:center; margin-top: 40px;">🛠 Customize Your Math Textbook</h3>
+    <div id="sectionOptionsContainer" style="...">
+        <div id="sectionOptions"></div>
+    </div>
+
+    <div style="text-align:center">
+        <button onclick="generateSelectedPDF()">📘 Generate PDF from Selected Lessons</button>
+    </div>
+
+    <h3 style="text-align:center;">Generated PDF Output</h3>
+    <iframe id="pdfViewer" style="width: 100%; height: 600px; border: none;" src=""></iframe>
+</div>
 
     <script>
-        async function askLLM() {
-            const question = document.getElementById('question').value;
-            const output = document.getElementById('output');
+        let savedTitle = "";
+        let savedLessonPlan = [];
+        
 
-            if (!question.trim()) {
-                output.textContent = "Please type a question! 🤔";
+        async function askLLM() {
+    const question = document.getElementById('question').value;
+    if (!question.trim()) return alert("Please type a question! 🤔");
+
+    const output = document.getElementById('output');
+    output.innerHTML = "<p>Generating lesson plan... ⏳</p>";
+
+    //document.getElementById("selectedLessonsTitle").style.display = "block";
+
+    try {
+        const res = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question })
+        });
+        const data = await res.json();
+        if (data.lessons) {
+            savedLessonPlan = data.lessons;
+            savedTitle = data.title;
+            output.innerHTML = "";
+            document.getElementById("contentArea").style.display = "block"; // <-- SHOW THIS
+            displaychexplation(savedLessonPlan);
+            displayChapters(savedLessonPlan);
+            
+            renderSectionOptions();
+        } else {
+            output.textContent = "No Table of Contents. Try again!";
+            document.getElementById("contentArea").style.display = "none"; // <-- HIDE IF NO RESULTS
+        }
+    } catch (error) {
+        console.error(error);
+        output.innerHTML = `<div class='error'><p>😢 Something went wrong!</p><p>${error.message}</p></div>`;
+        document.getElementById("contentArea").style.display = "none"; // <-- HIDE IF ERROR
+    }
+}
+
+        
+        function displaychexplation(plan) {
+    // Corrected the query for the container
+    const container = document.getElementById("explanation"); // Use ID instead of class in getElementById
+    container.innerHTML = '';
+    const SectionCh = document.createElement("h3");
+    SectionCh.innerHTML = `<div><strong>Chapter and Lesson Explanation</strong></div>`;
+    SectionCh.style.textAlign = "center"; // Centering the title
+    // Chapter and Lesson Explanation
+    plan.forEach((chapter, index) => {
+        
+        // Create a new section for Chapters
+        const newChapterSection = document.createElement("div");
+        newChapterSection.id = "newChapterSection"; // Giving a unique ID to the new section
+        const newTitle = document.createElement("div");
+        // Create a centered title for the Chapters
+       newTitle.innerHTML = `
+    <h3 style="text-align: center; margin-bottom: 0.5rem;">📘 ${chapter.chapter}</h3>
+    <p style="text-align: center; color: #555; max-width: 600px; margin: 0 auto 1.5rem; font-size: 1rem;">
+        ${chapter.explanation || ''}
+    </p>
+`;
+
+
+        // Append the title to the new section
+        newChapterSection.appendChild(newTitle);
+
+        // Create a container for the lessons in the new section
+        const newLessonContainer = document.createElement("div");
+        newLessonContainer.id = "chapts"; // Setting the ID to "chapt"
+
+        // Loop through the chapters and add chapter explanations
+        chapter.lessons.forEach((lessonObj, i) => {
+            const item = document.createElement("div");
+            item.className = "lesson-item";
+
+            // Create chapter title and explanation
+            item.innerHTML = `
+            <h4>${lessonObj.lesson}</h4>
+            <p><strong>-</strong> ${lessonObj.explanation}</p>
+            `;
+
+            // Append the item to the new lesson container
+            newLessonContainer.appendChild(item);
+        });
+
+        // Append the lesson container to the new section
+        newChapterSection.appendChild(newLessonContainer);
+
+        // Optionally, append the new section to a parent container in the HTML
+        container.appendChild(newChapterSection); // Appending to the correct container
+    });
+}
+
+        function displayChapters(plan) {
+            const container = document.getElementById("chapterContainer");
+            container.innerHTML = '';
+            container.id = "chapterContainer";
+
+            // Select All Card (default selected)
+            const allCard = document.createElement("div");
+            allCard.className = "chapter-card select-all-card selected";
+            allCard.id = "selectAllLessonsCard";
+            allCard.textContent = "Select All Lessons";
+            allCard.onclick = () => toggleAllLessonsCard();
+            container.appendChild(allCard);
+
+            plan.forEach((chapter, index) => {
+                const card = document.createElement("div");
+                card.className = "chapter-card selected"; // default selected
+                card.dataset.chapterIndex = index;
+
+                card.onclick = function (e) {
+                    if (e.target.tagName.toLowerCase() === 'input') return;
+                    const checkboxes = document.querySelectorAll(`.lesson-checkbox[data-chapter="${index}"]`);
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    checkboxes.forEach(cb => cb.checked = !allChecked);
+                    updateChapterSelection(index);
+                };
+
+                const title = document.createElement("h3");
+                title.textContent = chapter.chapter;
+
+                const lessonList = document.createElement("div");
+                lessonList.id = `lesson-list-${index}`;
+                lessonList.className = "lesson-list";
+
+                lessonList.id = `lesson-list-${index}`;
+                Sortable.create(lessonList, {
+                    animation: 150,
+                    handle: 'label',
+                    onEnd: updateSelectedSummary
+                });
+
+                chapter.lessons.forEach((lessons, i) => {
+                    const item = document.createElement("div");
+                    item.className = "lesson-item";
+                    item.innerHTML = `<label><input type="checkbox" class="lesson-checkbox" data-chapter="${index}" data-lesson="${i}" onchange="updateChapterSelection(${index})" checked> ${lessons.lesson}</label>`;
+                    lessonList.appendChild(item);
+                });
+
+                const addLessonButton = document.createElement("button");
+                addLessonButton.className = "add-lesson-button";
+                addLessonButton.textContent = "Add Lesson";
+                addLessonButton.onclick = function () {
+                    const newLesson = prompt("Enter new lesson name:");
+                    if (newLesson) {
+                        chapter.lessons.push(newLesson);
+                        displayChapters(savedLessonPlan); // re-render
+                    }
+                };
+
+                card.appendChild(title);
+                card.appendChild(lessonList);
+                card.appendChild(addLessonButton);
+                container.appendChild(card);
+            });
+
+            updateGlobalSelectCard(); // optional: force re-check top bar state
+            updateSelectedSummary();
+
+            Sortable.create(container, {
+                animation: 150,
+                handle: 'h3',
+                onEnd: updateSelectedSummary  // 每次拖曳後更新摘要順序
+            });
+        }
+
+
+        function updateChapterSelection(index) {
+            const chapterCard = document.querySelector(`.chapter-card[data-chapter-index="${index}"]`);
+            const checkboxes = document.querySelectorAll(`.lesson-checkbox[data-chapter="${index}"]`);
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            chapterCard.classList.toggle("selected", allChecked);
+            updateGlobalSelectCard();
+            updateSelectedSummary();
+        }
+
+        function toggleAllLessonsCard() {
+            const card = document.getElementById("selectAllLessonsCard");
+            const isSelected = card.classList.toggle("selected");
+            const checkboxes = document.querySelectorAll(".lesson-checkbox");
+            checkboxes.forEach(cb => cb.checked = isSelected);
+            const chapters = new Set([...checkboxes].map(cb => cb.dataset.chapter));
+            chapters.forEach(i => updateChapterSelection(i));
+            updateSelectedSummary();
+        }
+
+        function updateGlobalSelectCard() {
+            const checkboxes = document.querySelectorAll(".lesson-checkbox");
+            const card = document.getElementById("selectAllLessonsCard");
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            card.classList.toggle("selected", allChecked);
+        }
+
+        function updateSelectedSummary() {
+            const summary = {};
+            const checkboxes = document.querySelectorAll(".lesson-checkbox:checked");
+            checkboxes.forEach(cb => {
+                const chapterIndex = cb.dataset.chapter;
+                const lessonIndex = cb.dataset.lesson;
+                const chapterName = savedLessonPlan[chapterIndex]?.chapter;
+                const lessonName = savedLessonPlan[chapterIndex]?.lessons[lessonIndex];
+                if (!summary[chapterName]) summary[chapterName] = [];
+                summary[chapterName].push(lessonName);
+            });
+
+            const container = document.getElementById("selectedSummary");
+            if (Object.keys(summary).length === 0) {
+                container.innerHTML = "<p>No lessons selected yet.</p>";
                 return;
             }
 
-            output.textContent = "Thinking... 🤔";
+            let html = "";
+            for (const [chapter, lessons] of Object.entries(summary)) {
+                html += `<strong>${chapter}</strong><ul>`;
+                lessons.forEach(lesson => {
+                    html += `<li>${lesson.lesson}</li>`;
+                });
+                html += `</ul>`;
+            }
+            container.innerHTML = html;
+        }
 
-            try {
-                const response = await fetch('/ask', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question })
+
+        function renderSectionOptions() {
+            const sectionData = [
+                { value: "concepts", label: "Facts and Concepts", desc: "Introduction, key formulas, and a cheat-sheet summary." },
+                { value: "graph", label: "Graphical Representation", desc: "Visual graphs to explain ideas." },
+                { value: "strategies", label: "Strategies and Procedures", desc: "Step-by-step methods and common pitfalls." },
+                { value: "rationale", label: "Rationales", desc: "Explanation of why steps and strategies work." },
+                { value: "vocab", label: "Vocabulary Table", desc: "Key terms and definitions in a table format." },
+                { value: "mastering", label: "Mastering This Lesson", desc: "Summary of facts, strategies, and rationales." },
+                { value: "hist", label: "Historical Context", desc: "Origins and notable contributors." },
+                { value: "realworld", label: "Real-World Applications", desc: "How this math is used in life and work." },
+                { value: "initial", label: "Case Study", desc: "A real or theoretical situation to apply knowledge." },
+                { value: "examples", label: "Examples and Demonstrations", desc: "Progressive examples from basic to advanced." },
+                { value: "applications", label: "Applications Activity", desc: "Activities that apply the lesson in context." },
+                { value: "assessment", label: "Assessment Strategies", desc: "Ideas for quizzes and other checks for understanding." },
+                { value: "additional", label: "Additional Resources", desc: "Helpful links, videos, and tools." },
+                { value: "theoretical", label: "Theoretical Background", desc: "Key concepts and definitions." },
+                { value: "principles", label: "Underlying Principles", desc: "Mathematical foundations and their relevance." },
+                { value: "practice", label: "Practice Problems", desc: "Custom number of exercises.", input: true },
+                { value: "answer", label: "Answer", desc: "Step-by-step solutions to practice problems." },
+            ];
+
+            const sectionOptions = document.getElementById("sectionOptions");
+            sectionOptions.innerHTML = "";
+
+            // Add "Select All Sections" control
+            const toggleAllLine = document.createElement("div");
+            toggleAllLine.style.marginBottom = "15px";
+            toggleAllLine.style.fontSize = "15px";
+
+            const toggleAll = document.createElement("input");
+            toggleAll.type = "checkbox";
+            toggleAll.id = "toggleAllSections";
+            toggleAll.checked = true;
+
+            const toggleLabel = document.createElement("label");
+            toggleLabel.textContent = " Select All Sections";
+            toggleLabel.style.fontWeight = "bold";
+            toggleLabel.style.marginLeft = "8px";
+
+            toggleAll.onchange = () => {
+                const allBoxes = document.querySelectorAll(".section-option");
+                allBoxes.forEach(cb => (cb.checked = toggleAll.checked));
+            };
+
+            toggleAllLine.appendChild(toggleAll);
+            toggleAllLine.appendChild(toggleLabel);
+            sectionOptions.appendChild(toggleAllLine);
+
+            sectionData.forEach(section => {
+                const line = document.createElement("div");
+                line.style.marginBottom = "10px";
+                line.style.fontSize = "15px";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "section-option";
+                checkbox.value = section.value;
+                checkbox.checked = true;
+
+                const label = document.createElement("strong");
+                label.style.marginLeft = "8px";
+                label.textContent = section.label;
+
+                const description = document.createElement("span");
+                description.textContent = ` - ${section.desc}`;
+
+                line.appendChild(checkbox);
+                line.appendChild(label);
+                line.appendChild(description);
+
+
+                if (section.input) {
+                    const countInput = document.createElement("input");
+                    countInput.type = "number";
+                    countInput.id = "practiceCount";
+                    countInput.value = 10;
+                    countInput.min = 1;
+                    countInput.max = 30;
+                    countInput.style.marginLeft = "12px";
+                    countInput.style.width = "60px";
+                    countInput.title = "Number of problems";
+                    line.appendChild(countInput);
+                }
+
+                checkbox.addEventListener("change", () => {
+                    const allBoxes = document.querySelectorAll(".section-option");
+                    const allChecked = Array.from(allBoxes).every(cb => cb.checked);
+                    document.getElementById("toggleAllSections").checked = allChecked;
                 });
 
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
+                sectionOptions.appendChild(line);
+            });
+        }
+
+
+
+
+        async function generateSelectedPDF() {
+            const selectedLessons = [];
+
+            savedLessonPlan.forEach((chapter, chapterIndex) => {
+                const selected = [];
+                chapter.lessons.forEach((lesson, lessonIndex) => {
+                    const checkbox = document.querySelector(`.lesson-checkbox[data-chapter='${chapterIndex}'][data-lesson='${lessonIndex}']`);
+                    if (checkbox && checkbox.checked) {
+                        selected.push(lesson);
+                    }
+                });
+                if (selected.length > 0) {
+                    selectedLessons.push({ chapter: chapter.chapter, lessons: selected, explanation: chapter.explanation });
                 }
+            });
 
-                const data = await response.json();
+            const selectedSections = Array.from(document.querySelectorAll(".section-option:checked"))
+                .map(cb => cb.value);
 
-                if (data.pdf_url) {
-                    // Display the PDF inline using an <embed> tag
-                    output.innerHTML = `<embed src="${data.pdf_url}" width="100%" height="600px" type="application/pdf" />`;
+            const practiceProblemCount = document.getElementById("practiceCount")?.value || 10;
 
-                    // Optional: Add a download link
-                    output.innerHTML += `<p><a href="${data.pdf_url}" download>Download PDF</a></p>`;
-                } else {
-                    output.textContent = "Oops! No PDF found. Try again!";
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                output.textContent = "Something went wrong. Please try again later. 😢";
+
+            const res = await fetch("/generate_pdf", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title: savedTitle,
+                    lessonplan: selectedLessons,
+                    selected_sections: selectedSections,
+                    practice_problem_count: parseInt(practiceProblemCount)
+                })
+
+            });
+
+            const data = await res.json();
+            if (data.pdf_url) {
+                document.getElementById("pdfViewer").src = data.pdf_url;
+            } else {
+                alert("Failed to generate PDF.");
             }
         }
     </script>
 </body>
+
 </html>
+
+
+
+
+
+
+
+
 
 
