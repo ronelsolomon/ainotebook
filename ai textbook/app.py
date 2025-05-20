@@ -29,10 +29,7 @@ from reportlab.lib.pagesizes import LETTER
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 
-# API key
-client = Groq(
-    api_key="",
-)
+
 
 
 
